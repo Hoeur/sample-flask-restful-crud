@@ -1,8 +1,10 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
+
 from db import Base
 
-class UserModel(Base):
+from .base_modal import BaseModal
+class UserModel(BaseModal, Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
     __username = Column('username', String(32), unique=True, nullable=False, index=True)
@@ -12,7 +14,8 @@ class UserModel(Base):
     created_at = Column(DateTime(), default=func.now())
     updated_at = Column(DateTime(), default=func.now(), onupdate=func.now())
     
-    def __init__(self, schema):
+    def __init__(self, schema={}):
+        super().__init__()
         for key, value in schema.items():
             if(hasattr(self, key)):
                 setattr(self, key, value)
