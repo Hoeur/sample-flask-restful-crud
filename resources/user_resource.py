@@ -1,20 +1,32 @@
 from flask import make_response, request
 from flask_restful import Resource
 
+from db import session
+from models import UserModel
+from schemas import UserSchema
+
 class userResource(Resource):
     ### get user , method : get###
     def get(self):
+        users = session.query(UserModel).all()
+        
+        user_schema = UserSchema()
+        user_json = user_schema.dump(users, many=True)
         return make_response({
-            "user" : {
-                "name" : "Hoeur Lihour"
-            }
-        }, 200)
+            "users": user_json
+            }, 200)
         
     def post(self):
         ### create user , method : post ###
-        print(request)
-        user = request.get_json()
-        return make_response(user, 201)
+        user = request.get_json() 
+        user_data = UserModel(user)
+        
+        session.add(user_data)
+        session.commit()
+        
+        user_schema = UserSchema()
+        user_json = user_schema.dump(user_data)
+        return make_response(user_json, 201)
     
     def put(self):
         ### update user , method : put ###=
